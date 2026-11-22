@@ -38,7 +38,7 @@ const Login = () => {
         <form onSubmit={handleSubmit(submission)}> 
         <Box className={"Whitebox"}>
             <Box className={"itembox"}>
-                <Box className={"title"}> Login for auth app
+                <Box className={"title"}> Login 
 
                 </Box>
             </Box>

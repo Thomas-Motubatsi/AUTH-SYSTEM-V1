@@ -8,6 +8,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import ProtectedRoute from './Componets/Forms/ProjectedRoutes'
 import PasswordResetRequest from './Componets/PasswordResetRequest'
 import PasswordReset from './Componets/PasswordReset'
+import ITTicketPortal from './Componets/ITTicketPortal'
 
 function App() {
  
@@ -32,6 +33,7 @@ function App() {
             <Route element={<ProtectedRoute/>}>
                 <Route path='/home' element={<Home />} />
                 <Route path='/about' element={<About />} />
+                <Route path='/tickets' element={<ITTicketPortal />} />
                  
             </Route>
           </Routes>

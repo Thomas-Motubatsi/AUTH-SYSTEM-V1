@@ -26,11 +26,21 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
+    class Role(models.TextChoices):
+        STAFF = 'STAFF', 'Staff'
+        IT_STAFF = 'IT_STAFF', 'IT Staff'
     email = models.EmailField(max_length=200, unique=True)
     birthday = models.DateField(null=True, blank=True)
     username = models.CharField(max_length=200, null=True, blank=True)
 
-    objects = CustomUserManager()
+    # User role distinction
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+        default=Role.STAFF
+    )
+
+    objects  = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -62,7 +62,7 @@ const Register = () => {
             <form onSubmit={handleSubmit(submission)}>
                 <Box className="Whitebox">
                     <Box className="itembox">
-                        <Box className="title">Register for auth app</Box>
+                        <Box className="title">Register </Box>
                     </Box>
                     <Box className="itembox">
                         <MyTextFields

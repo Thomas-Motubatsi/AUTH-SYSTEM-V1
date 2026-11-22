@@ -1,9 +1,10 @@
 from rest_framework import viewsets, permissions, mixins
 from rest_framework.response import Response
-from .serializers import RegisterSerializers, LoginSerializer
+from .serializers import RegisterSerializers, LoginSerializer,  CurrentUserSerializer
 from django.contrib.auth import get_user_model, authenticate
 from knox.models import AuthToken
 from knox.auth import TokenAuthentication
+from rest_framework.decorators import action
 
 
 
@@ -52,6 +53,13 @@ class UserViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = RegisterSerializers
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+
+        serializer = CurrentUserSerializer(request.user)
+
+        return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

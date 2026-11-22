@@ -12,6 +12,7 @@ import ListItemText from '@mui/material/ListItemText';
 import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
 import InfoIcon from '@mui/icons-material/Info';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 import { Link, useLocation } from 'react-router-dom';
 import AxiosInstance from './AxiosInstance';
 import { useNavigate } from 'react-router-dom';
@@ -64,6 +65,15 @@ export default function Navbar(props) {
                    <AddHomeWorkIcon /> 
                 </ListItemIcon>
                 <ListItemText primary="Home" /> 
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem key="nav-tickets" disablePadding>
+              <ListItemButton component={Link} to="/tickets" selected={path === "/tickets"}>
+                <ListItemIcon>
+                  <ConfirmationNumberIcon />
+                </ListItemIcon>
+                <ListItemText primary="Tickets" />
               </ListItemButton>
             </ListItem>
 

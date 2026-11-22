@@ -14,14 +14,23 @@ class LoginSerializer(serializers.Serializer):
 
 
 class RegisterSerializers(serializers.ModelSerializer):
+    first_name = serializers.CharField(
+        max_length=150,
+        required=True,
+        allow_blank=False
+    )
     class Meta:  # Must have a Capital "M"
         model = User
         # FIX: Ensure this is spelled exactly as 'fields' with a single 's'
-        fields = ('id', 'email', 'password')  
+        fields = ('id', 'email','first_name', 'password')  
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
     
+class CurrentUserSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'email')
