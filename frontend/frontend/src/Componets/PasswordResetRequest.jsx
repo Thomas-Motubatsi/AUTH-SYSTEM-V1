@@ -8,7 +8,7 @@ import AxiosInstance from './AxiosInstance'
 import Message from './Message' 
 
 const PasswordResetRequest = () => {
-    const [showmessage, setShowmessage] = useState(false)
+    const [messageText, setMessageText] = useState('')
 
     const { handleSubmit, control } = useForm({
         defaultValues: {
@@ -17,17 +17,19 @@ const PasswordResetRequest = () => {
     })
 
     const submission = (data) => {
-        
         AxiosInstance.post('api/password_reset/', {
             email: data.email,
         })
-        .then((response) => {
-            setShowmessage(true)
+        .then(() => {
+            setMessageText(
+                'If your email exists, you will receive instructions to reset your password.'
+            )
         })
         .catch((error) => {
-            console.error("Password reset error: ", error)
-            
-            setShowmessage(true) 
+            console.error('Password reset error:', error)
+            setMessageText(
+                'Unable to request a password reset right now. Please try again later.'
+            )
         })
     }
 
@@ -35,9 +37,8 @@ const PasswordResetRequest = () => {
         <div className={"myBackground"}> 
             <form onSubmit={handleSubmit(submission)}> 
                 
-                {showmessage && (
-                    <Message text={"If your email exists, you got an email with instructions to reset password"} 
-                    />
+                {messageText && (
+                    <Message text={messageText} />
                 )}
 
                 <Box className={"Whitebox"}>

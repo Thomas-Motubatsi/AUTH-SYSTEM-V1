@@ -15,9 +15,9 @@ AxiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('Token')
         if (token) {
-            config.headers.set('Authorization', `Token ${token}`)
+            config.headers.Authorization = `Token ${token}`
         } else {
-            config.headers.delete('Authorization')
+            delete config.headers.Authorization
         }
         return config
     }

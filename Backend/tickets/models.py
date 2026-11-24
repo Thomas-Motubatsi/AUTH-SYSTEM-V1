@@ -108,18 +108,88 @@ class Ticket(models.Model):
     def __str__(self):
         return f"Ticket {self.ticket_number} - {self.title}"
 
-# Create your models here.
-# AI-generated ticket analysis
-ai_summary = models.TextField(
-    blank=True,
-    help_text="AI-generated summary of the reported issue."
-)
+    # AI-generated ticket analysis
 
-ai_suggested_priority = models.CharField(
-    max_length=20,
-    choices=Ticket.Priority.choices,
-    null=True,
-    blank=True,
-    help_text="AI-recommended priority. Requires IT staff review."
-)
+    ai_summary = models.TextField(
+        blank=True,
+        help_text="AI-generated summary of the reported issue."
+    )
 
+    ai_suggested_priority = models.CharField(
+        max_length=20,
+        choices=Priority.choices,
+        null=True,
+        blank=True,
+        help_text="AI-recommended priority. Requires IT staff review."
+    )
+
+
+class TicketActivity(models.Model):
+
+    class Action(models.TextChoices):
+        CREATED = 'CREATED', 'Ticket Created'
+        ASSIGNED = 'ASSIGNED', 'Ticket Assigned'
+        REASSIGNED = 'REASSIGNED', 'Ticket Reassigned'
+        STATUS_CHANGED = 'STATUS_CHANGED', 'Status Changed'
+        RESOLUTION_UPDATED = 'RESOLUTION_UPDATED', 'Resolution Updated'
+
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        related_name='activities'
+    )
+
+    performed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='ticket_activities'
+    )
+
+    action = models.CharField(
+        max_length=30,
+        choices=Action.choices
+    )
+
+    description = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['ticket', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.ticket.ticket_number} - {self.action}'
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='notifications'
+    )
+
+    title = models.CharField(max_length=150)
+    message = models.TextField()
+
+    is_read = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.title} - {self.recipient.email}'

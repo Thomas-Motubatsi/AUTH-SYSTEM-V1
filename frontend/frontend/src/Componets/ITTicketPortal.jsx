@@ -28,7 +28,6 @@ export default function ITTicketPortal() {
   const [error, setError] = useState('');
 
   const loadTickets = useCallback(async () => {
-    setError('');
     try {
       const response = await AxiosInstance.get('api/tickets/');
       setTickets(response.data);

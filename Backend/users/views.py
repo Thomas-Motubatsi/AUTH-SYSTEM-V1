@@ -1,16 +1,24 @@
+
 from rest_framework import viewsets, permissions, mixins
 from rest_framework.response import Response
-from .serializers import RegisterSerializers, LoginSerializer,  CurrentUserSerializer
-from django.contrib.auth import get_user_model, authenticate
-from knox.models import AuthToken
-from knox.auth import TokenAuthentication
 from rest_framework.decorators import action
 
+from django.contrib.auth import get_user_model, authenticate
 
+from knox.models import AuthToken
+from knox.auth import TokenAuthentication
 
+from .permissions import IsITAdmin
 
+from .serializers import (
+    RegisterSerializers,
+    LoginSerializer,
+    CurrentUserSerializer,
+    UserManagementSerializer
+)
 
 User = get_user_model()
+
 
 class LoginViewset(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
@@ -48,20 +56,38 @@ class RegisterViewset(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=201)
         
-class UserViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
+
+
+
+class UserViewset(
+    mixins.ListModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet
+):
     authentication_classes = (TokenAuthentication,)
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializers
+    permission_classes = [IsITAdmin]
+    queryset = User.objects.all().order_by('first_name', 'email')
+    serializer_class = UserManagementSerializer
+
+    http_method_names = ['get', 'patch', 'head', 'options']
+
+    def get_permissions(self):
+        if self.action == 'me':
+            return [permissions.IsAuthenticated()]
+
+        return [IsITAdmin()]
+
+    def get_serializer(self, *args, **kwargs):
+        if self.action == 'me':
+            serializer_class = CurrentUserSerializer
+        else:
+            serializer_class = UserManagementSerializer
+
+        kwargs.setdefault('context', self.get_serializer_context())
+
+        return serializer_class(*args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def me(self, request):
-
-        serializer = CurrentUserSerializer(request.user)
-
-        return Response(serializer.data)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data)

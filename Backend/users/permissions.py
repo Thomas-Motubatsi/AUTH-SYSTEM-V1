@@ -30,3 +30,29 @@ class IsHospitalStaff(BasePermission):
             and request.user.is_authenticated
             and request.user.role == 'STAFF'
         )
+
+class IsITAdmin(BasePermission):
+    """Allows IT administrators."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and (
+                request.user.role == 'IT_ADMIN'
+                or request.user.is_superuser
+            )
+        )
+
+
+class IsITStaffOrAdmin(BasePermission):
+    """Allows both IT technicians and administrators."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and (
+                request.user.role in ['IT_STAFF', 'IT_ADMIN']
+                or request.user.is_superuser
+            )
+        )
+

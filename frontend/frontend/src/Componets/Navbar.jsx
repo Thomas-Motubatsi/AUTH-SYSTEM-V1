@@ -1,98 +1,259 @@
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
-import InfoIcon from '@mui/icons-material/Info';
-import LogoutIcon from '@mui/icons-material/Logout';
-import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
-import { Link, useLocation } from 'react-router-dom';
+
+import React from 'react';
+
+import {
+    Box,
+    Drawer,
+    CssBaseline,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Typography,
+    Divider,
+    Avatar,
+} from '@mui/material';
+
+import {
+    DashboardRounded,
+    ConfirmationNumberRounded,
+    LogoutRounded,
+    LocalHospitalRounded,
+} from '@mui/icons-material';
+
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AxiosInstance from './AxiosInstance';
-import { useNavigate } from 'react-router-dom';
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
-export default function Navbar(props) {
-  const { content } = props;
-  
-  const location = useLocation();
-  const path = location.pathname;
-  const Navigate = useNavigate()
+export default function Navbar({ content }) {
+    const location = useLocation();
+    const navigate = useNavigate();
 
-  const LogoutUser =()=>{
-    AxiosInstance.post(`logout/`,{
+    const LogoutUser = async () => {
+        try {
+            await AxiosInstance.post('logout/', {});
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            localStorage.removeItem('Token');
+            navigate('/');
+        }
+    };
 
-    })
-    .then(()=>{
-      localStorage.removeItem("Token")
-      Navigate("/")
-    })
-  }
-  
+    const navigationItems = [
+        {
+            title: 'Dashboard',
+            path: '/home',
+            icon: <DashboardRounded />,
+        },
+        {
+            title: 'Tickets',
+            path: '/tickets',
+            icon: <ConfirmationNumberRounded />,
+        },
+    ];
 
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Clipped drawer
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
-        }}
-      >
-        <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            
-            <ListItem key="nav-home" disablePadding>
-              <ListItemButton component={Link} to="/home" selected={path === "/home"}>
-                <ListItemIcon>
-                   <AddHomeWorkIcon /> 
-                </ListItemIcon>
-                <ListItemText primary="Home" /> 
-              </ListItemButton>
-            </ListItem>
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                minHeight: '100vh',
+                backgroundColor: '#f4f6fa',
+            }}
+        >
+            <CssBaseline />
 
-            <ListItem key="nav-tickets" disablePadding>
-              <ListItemButton component={Link} to="/tickets" selected={path === "/tickets"}>
-                <ListItemIcon>
-                  <ConfirmationNumberIcon />
-                </ListItemIcon>
-                <ListItemText primary="Tickets" />
-              </ListItemButton>
-            </ListItem>
+            {/* Sidebar */}
+            <Drawer
+                variant="permanent"
+                sx={{
+                    width: drawerWidth,
+                    flexShrink: 0,
 
-            
-            <ListItem key="nav-about" disablePadding>
-              <ListItemButton onClick={LogoutUser}>
-                <ListItemIcon>
-                   <LogoutIcon/> 
-                </ListItemIcon>
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </ListItem>
-          </List>
+                    '& .MuiDrawer-paper': {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        border: 'none',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    },
+                }}
+            >
+                {/* Brand */}
+                <Box
+                    sx={{
+                        px: 3,
+                        py: 3,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                    }}
+                >
+                    <Avatar
+                        sx={{
+                            bgcolor: '#172b4d',
+                            width: 42,
+                            height: 42,
+                            borderRadius: 2,
+                        }}
+                    >
+                        <LocalHospitalRounded />
+                    </Avatar>
+
+                    <Box>
+                        <Typography
+                            variant="subtitle1"
+                            fontWeight={800}
+                            color="#172b4d"
+                        >
+                            IT SUPPORT
+                        </Typography>
+
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                        >
+                            Hospital Ticket System
+                        </Typography>
+                    </Box>
+                </Box>
+
+                <Divider sx={{ borderColor: '#edf0f5' }} />
+
+                {/* Navigation */}
+                <Box sx={{ px: 2, py: 3, flexGrow: 1 }}>
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            px: 1.5,
+                            mb: 1.5,
+                            display: 'block',
+                            color: '#929bad',
+                            fontWeight: 700,
+                            letterSpacing: 1,
+                        }}
+                    >
+                        WORKSPACE
+                    </Typography>
+
+                    <List disablePadding>
+                        {navigationItems.map((item) => {
+                            const active = location.pathname === item.path;
+
+                            return (
+                                <ListItem
+                                    key={item.path}
+                                    disablePadding
+                                    sx={{ mb: 1 }}
+                                >
+                                    <ListItemButton
+                                        component={Link}
+                                        to={item.path}
+                                        selected={active}
+                                        sx={{
+                                            borderRadius: 2,
+                                            py: 1.3,
+                                            px: 1.5,
+
+                                            color: active ? '#ffffff' : '#64748b',
+
+                                            backgroundColor: active
+                                                ? '#172b4d'
+                                                : 'transparent',
+
+                                            '&.Mui-selected': {
+                                                backgroundColor: '#172b4d',
+                                                color: '#ffffff',
+                                            },
+
+                                            '&.Mui-selected:hover': {
+                                                backgroundColor: '#243e68',
+                                            },
+
+                                            '&:hover': {
+                                                backgroundColor: active
+                                                    ? '#243e68'
+                                                    : '#f1f4f9',
+                                            },
+
+                                            '& .MuiListItemIcon-root': {
+                                                color: 'inherit',
+                                                minWidth: 40,
+                                            },
+                                        }}
+                                    >
+                                        <ListItemIcon>
+                                            {item.icon}
+                                        </ListItemIcon>
+
+                                        <ListItemText
+                                            primary={item.title}
+                                            primaryTypographyProps={{
+                                                fontSize: 14,
+                                                fontWeight: active ? 700 : 500,
+                                            }}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                            );
+                        })}
+                    </List>
+                </Box>
+
+                {/* Logout */}
+                <Box sx={{ p: 2 }}>
+                    <Divider sx={{ mb: 2, borderColor: '#edf0f5' }} />
+
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            onClick={LogoutUser}
+                            sx={{
+                                borderRadius: 2,
+                                py: 1.3,
+                                color: '#dc4c4c',
+
+                                '&:hover': {
+                                    backgroundColor: '#fff1f1',
+                                },
+
+                                '& .MuiListItemIcon-root': {
+                                    color: '#dc4c4c',
+                                    minWidth: 40,
+                                },
+                            }}
+                        >
+                            <ListItemIcon>
+                                <LogoutRounded />
+                            </ListItemIcon>
+
+                            <ListItemText
+                                primary="Logout"
+                                primaryTypographyProps={{
+                                    fontSize: 14,
+                                    fontWeight: 600,
+                                }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                </Box>
+            </Drawer>
+
+            {/* Main content */}
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    minWidth: 0,
+                    minHeight: '100vh',
+                    p: { xs: 2, md: 4 },
+                    backgroundColor: '#f4f6fa',
+                }}
+            >
+                {content}
+            </Box>
         </Box>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Toolbar />
-        {content}
-      </Box>
-    </Box>
-  );
+    );
 }
